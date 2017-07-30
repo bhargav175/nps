@@ -16,6 +16,7 @@ import getLogger from '../get-logger'
 import {resolveScriptObjectToScript} from '../resolve-script-object-to-string'
 import getScriptByPrefix from './get-script-by-prefix'
 import initialize from './initialize'
+import eject from './eject'
 
 const log = getLogger()
 
@@ -104,11 +105,13 @@ function loadConfig(configPath, input) {
 
 export {
   initialize,
+  eject,
   help,
   getModuleRequirePath,
   preloadModule,
   loadConfig,
   specificHelpScript,
+  getAvailableScripts,
 }
 
 /****** implementations ******/

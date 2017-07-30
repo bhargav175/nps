@@ -9,8 +9,10 @@ import {
   preloadModule,
   loadConfig,
   initialize,
+  eject,
   help,
   specificHelpScript,
+  getAvailableScripts,
 } from '../bin-utils'
 import getCompletionScripts from './autocomplete-get-scripts'
 
@@ -73,6 +75,7 @@ function parse(rawArgv) {
     .alias('v', 'version')
     .options(baseOptions)
     .command(...getInitCommand())
+    .command(...getEjectCommand())
     .completion('completion', completionHandler)
     .exitProcess(shouldExitProcess())
 
@@ -202,6 +205,41 @@ function parse(rawArgv) {
           `,
         ),
       )
+    }
+  }
+
+  /* eject command */
+  function getEjectCommand() {
+    const command = 'eject'
+    const description = 'revert from nps to npm'
+    return [command, description, getConfig, onEject]
+
+    function getConfig(ejectYargs) {
+      return ejectYargs.usage('Usage: $0 eject [options]').options({
+        config: configOption,
+        type: {
+          describe: 'The type of config to generate',
+          choices: ['js', 'yml'],
+          default: 'js',
+        },
+      })
+    }
+
+    function onEject(initArgv) {
+      commandExecuted = true
+      const configFilepath = getPSConfigFilepath(initArgv)
+      if (configFilepath) {
+        const config = loadConfig(configFilepath)
+        const scripts = getAvailableScripts(config.scripts)
+        eject(configFilepath, scripts)
+      } else {
+        log.warn({
+          message: chalk.yellow(
+            'Unable to find a config file and none was specified.',
+          ),
+          ref: 'unable-to-find-config',
+        })
+      }
     }
   }
 
